@@ -13,7 +13,7 @@ module.exports = class Downloader {
     }
 
     static manifest;
-    static loadManifest = async (basePath, intervalMinutes=3) => {
+    static loadManifest = async basePath => {
         if(!Downloader.manifest){
             try {
                 //load an existing manifest
@@ -26,11 +26,7 @@ module.exports = class Downloader {
                 Downloader.saveManifest(basePath);
             }
         }
-
-        //save the manifest to file periodically
-        setInterval(() => Downloader.saveManifest(basePath), intervalMinutes * 60 * 1000);
-
-        console.log(`[Loading Manifest] Loaded ${Downloader.manifest.videos.length} existing videos. Saving to file every ${intervalMinutes} minute(s)`)
+        console.log(`[Loading Manifest] Loaded ${Downloader.manifest.videos.length} existing videos.`)
     }
 
     static saveManifest = basePath => {
@@ -44,16 +40,18 @@ module.exports = class Downloader {
         );
     }
 
-    static onDownloadComplete = async ({videoDetails, url}) => {
+    static onDownloadComplete = async ({videoDetails, options}) => {
         const { title, videoId, ownerChannelName, publishDate } = videoDetails;
-        console.log(`[Download Completed] ${title} ${url}`);
+        console.log(`[Download Completed] ${title} ${videoId}`);
         Downloader.manifest.videos.push({
             id: videoId,
             title: title,
             author: ownerChannelName,
-            datePublished: publishDate,
+            datePublished: publishDate, 
             dateDownloaded: new Date().toISOString()
         });
+
+        Downloader.saveManifest(options.basePath);
     }
 
     static toMB = i => (i / 1024 / 1024).toFixed(2)
@@ -72,9 +70,9 @@ module.exports = class Downloader {
         this._init();
     }
 
-    downloadVideo = async (url, filepath) => {
+    downloadVideo = async (videoId, filepath) => {
         try {
-            this.url = url;
+            this.videoId = videoId;
             this.filepath = filepath || await this._getFilePath();
 
             console.log(`[Downloading] ${this.filepath}`);
@@ -89,16 +87,15 @@ module.exports = class Downloader {
         }
     }
 
-    getInfo = async url => await ytdl.getInfo(url, {requestOptions: {headers: {cookie: this.options.cookie}}})
+    getInfo = async () => await ytdl.getInfo(this.videoId, {requestOptions: {headers: {cookie: this.options.cookie}}})
 
     _getFilePath = async () => {
-        const { videoDetails } = await this.getInfo(this.url);
+        const { videoDetails } = await this.getInfo();
         this.videoDetails = videoDetails;
-        const [baseURL, videoId] = this.url.split('?v=');
         return path.join(
             this.options.basePath, 
             this.options.subDirectory, 
-            `${sanitize.addUnderscore(videoDetails.title)} ${videoId || ""}.${this.options.format}`
+            `${sanitize.addUnderscore(videoDetails.title)} ${this.videoId || ""}.${this.options.format}`
         );
     }
 
@@ -157,7 +154,7 @@ module.exports = class Downloader {
     }
 
     _getVideo = () => {
-        const video = ytdl(this.url, {quality: 'highestvideo', requestOptions: {headers: {cookie: this.options.cookie}}});
+        const video = ytdl(this.videoId, {quality: 'highestvideo', requestOptions: {headers: {cookie: this.options.cookie}}});
         video.on('progress', (_, downloaded, total) => {
             this.video = { downloaded, total };
         });
@@ -165,7 +162,7 @@ module.exports = class Downloader {
     }
 
     _getAudio = () => {
-        const audio = ytdl(this.url, {quality: 'highestaudio', requestOptions: {headers: {cookie: this.options.cookie}}});
+        const audio = ytdl(this.videoId, {quality: 'highestaudio', requestOptions: {headers: {cookie: this.options.cookie}}});
         audio.on('progress', (_, downloaded, total) => {
             this.audio = { downloaded, total };
         });

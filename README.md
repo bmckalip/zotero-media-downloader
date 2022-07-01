@@ -41,12 +41,10 @@ FILE_FORMAT=mkv
 BASE_PATH=C:/path/to/download/location
 DEBUG=false
 CHECK_ZOTERO_INTERVAL_MINUTES=2
-SAVE_MANIFEST_INTERVAL_MINUTES=1
 ```
 
 * `FILE_FORMAT` defaults to mp4
 * `CHECK_ZOTERO_INTERVAL_MINUTES` How often to check the zotero API for new videos to download. Defaults to 5 minutes
-* `SAVE_MANIFEST_INTERVAL_MINUTES` How often to save the manifest file of downloaded videos. Defaults to 3 minutes
 * `YT_USER_COOKIE` is required to download some age-restricted videos. Without specifying this value, you will be unable to download many videos, and will see errors in the console. For best results, you should specify this variable with the full cookie value from a youtube network request in your browser.
 
     1. open chrome

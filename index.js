@@ -11,7 +11,6 @@ env = dotenvParseVariables(env.parsed);
 const { 
     DEBUG, 
     CHECK_ZOTERO_INTERVAL_MINUTES,
-    SAVE_MANIFEST_INTERVAL_MINUTES,
     ZOTERO_API_KEY, 
     ZOTERO_USER_ID, 
     ZOTERO_COLLECTION_NAME,
@@ -36,7 +35,7 @@ const loop = async downloader => {
 
     const retryMessage = `Checking again in ${CHECK_ZOTERO_INTERVAL_MINUTES} minute(s).`;
     if(newVideoIds.length > 0){
-        DEBUG && console.log(`[Checking Zotero] found ${newVideoIds.length} new videos, downloading. ${retryMessage}`);
+        console.log(`[Checking Zotero] found ${newVideoIds.length} new video(s), downloading. ${retryMessage}`);
         for (let i = 0; i < newVideoIds.length; i++) {
             await downloader.downloadVideo(newVideoIds[i]);
         }
@@ -46,7 +45,7 @@ const loop = async downloader => {
 }
 
 const main = async () => {
-    await Downloader.loadManifest(BASE_PATH, SAVE_MANIFEST_INTERVAL_MINUTES);
+    await Downloader.loadManifest(BASE_PATH);
     const downloader = new Downloader({
         cookie: YT_USER_COOKIE,
         format: FILE_FORMAT,

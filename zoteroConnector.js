@@ -1,7 +1,6 @@
 
 const axios = require('axios').default;
 
-//get youtube URL links from the zotero collection
 module.exports = async ({ZOTERO_API_KEY, ZOTERO_COLLECTION_NAME, ZOTERO_USER_ID}) => {
     try {
         const collections_url = `https://api.zotero.org/users/${ZOTERO_USER_ID}/collections`;

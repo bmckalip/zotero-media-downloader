@@ -36,12 +36,12 @@ const loop = async downloader => {
 
     const retryMessage = `Checking again in ${CHECK_ZOTERO_INTERVAL_MINUTES} minute(s).`;
     if(newVideoIds.length > 0){
-        console.log(`[Checking Zotero] found ${newVideoIds.length} new videos, downloading. ${retryMessage}`);
+        DEBUG && console.log(`[Checking Zotero] found ${newVideoIds.length} new videos, downloading. ${retryMessage}`);
         for (let i = 0; i < newVideoIds.length; i++) {
             await downloader.downloadVideo(newVideoIds[i]);
         }
     } else {
-        console.log(`[Checking Zotero] Nothing to download. ${existingVideoIds.length} / ${zoteroVideoIds.length} up to date. ${retryMessage}`);
+        DEBUG && console.log(`[Checking Zotero] Nothing to download. ${existingVideoIds.length} / ${zoteroVideoIds.length} up to date. ${retryMessage}`);
     }
 }
 

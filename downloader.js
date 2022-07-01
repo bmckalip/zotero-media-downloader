@@ -40,7 +40,7 @@ module.exports = class Downloader {
                 basePath, 
                 'manifest.json'
             ), 
-            JSON.stringify(Downloader.manifest)
+            JSON.stringify(Downloader.manifest, null, 4)
         );
     }
 
@@ -89,9 +89,7 @@ module.exports = class Downloader {
         }
     }
 
-    getInfo = async url => {
-        return await ytdl.getInfo(url, {requestOptions: {headers: {cookie: this.options.cookie}}});
-    }
+    getInfo = async url => await ytdl.getInfo(url, {requestOptions: {headers: {cookie: this.options.cookie}}})
 
     _getFilePath = async () => {
         const { videoDetails } = await this.getInfo(this.url);

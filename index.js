@@ -33,6 +33,8 @@ const loop = async downloader => {
 
     zoteroVideoIds.forEach(zvid => (manifestVideoIds.includes(zvid) ? existingVideoIds : newVideoIds).push(zvid));
 
+    DEBUG && console.log(`[Downloading] ${newVideoIds}`);
+
     const retryMessage = `Checking again in ${CHECK_ZOTERO_INTERVAL_MINUTES} minute(s).`;
     if(newVideoIds.length > 0){
         console.log(`[Checking Zotero] found ${newVideoIds.length} new video(s), downloading. ${retryMessage}`);

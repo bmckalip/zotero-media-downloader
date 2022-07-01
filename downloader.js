@@ -8,7 +8,7 @@ const fs = require('fs/promises');
 
 module.exports = class Downloader {
     static DEFAULT_MANIFEST = {
-        created: new Date().toDateString(),
+        created: new Date().toISOString(),
         videos: []
     }
 
@@ -22,16 +22,16 @@ module.exports = class Downloader {
                 Downloader.manifest = JSON.parse(rawData);
             } catch(e) {
                 //create a default manifest and save it to file immediately
-                Downloader.manifest = DEFAULT_MANIFEST;
+                console.log(`[Building New Manifest]`);
+                Downloader.manifest = Downloader.DEFAULT_MANIFEST;
                 Downloader.saveManifest(basePath);
             }
         }
         console.log(`[Loading Manifest] Loaded ${Downloader.manifest.videos.length} existing videos.`)
     }
 
-    static saveManifest = basePath => {
-        console.log(`[Saving Manifest] Recorded ${Downloader.manifest.videos.length} videos in the manifest.`)
-        fs.writeFile(
+    static saveManifest = async basePath => {
+        await fs.writeFile(
             path.join(
                 basePath, 
                 'manifest.json'
@@ -40,29 +40,13 @@ module.exports = class Downloader {
         );
     }
 
-    static onDownloadComplete = async ({videoDetails, options}) => {
-        const { title, videoId, ownerChannelName, publishDate } = videoDetails;
-        console.log(`[Download Completed] ${title} ${videoId}`);
-        Downloader.manifest.videos.push({
-            id: videoId,
-            title: title,
-            author: ownerChannelName,
-            datePublished: publishDate, 
-            dateDownloaded: new Date().toISOString()
-        });
-
-        Downloader.saveManifest(options.basePath);
-    }
-
     static toMB = i => (i / 1024 / 1024).toFixed(2)
 
     static DEFAULT_OPTIONS = {
-        showProgress: false,
         progressbarInterval: 1000,
         basePath: '/',
         subDirectory: '/',
-        format: 'mp4',
-        onDownloadComplete: Downloader.onDownloadComplete
+        format: 'mp4'
     }
 
     constructor(options){
@@ -77,6 +61,7 @@ module.exports = class Downloader {
 
             console.log(`[Downloading] ${this.filepath}`);
             this._init();
+            this._addToManifest();
             this._launchFFMPEG();
             this._getAudio();
             this._getVideo();
@@ -126,11 +111,21 @@ module.exports = class Downloader {
         this.audio = { downloaded: 0, total: Infinity };
         this.video = { downloaded: 0, total: Infinity };
         this.merged = { frame: 0, speed: '0x', fps: 0 };
-        this.progressbarHandle = null;
         this.start = Date.now();
     }
 
-    _launchFFMPEG = () => {        
+    _addToManifest = () => {
+        const { title, videoId, ownerChannelName, publishDate } = this.videoDetails;
+        Downloader.manifest.videos.push({
+            id: videoId,
+            title: title,
+            author: ownerChannelName,
+            datePublished: publishDate, 
+            dateDownloaded: new Date().toISOString()
+        });
+    }
+
+    _launchFFMPEG = () => {       
         this.ffmpegProcess = cp.spawn(ffmpeg, [
             '-loglevel', '8', '-hide_banner', // Remove ffmpeg's console spamming
             '-progress', 'pipe:3', // Redirect/Enable progress messages
@@ -145,12 +140,13 @@ module.exports = class Downloader {
               'inherit', 'inherit', 'inherit', //Standard: stdin, stdout, stderr
               'pipe', 'pipe', 'pipe', //Custom: pipe:3, pipe:4, pipe:5
             ],
-          });
-          
-          this.ffmpegProcess.on('close', () => {
-            this.options.onDownloadComplete(this);
-            clearInterval(this.progressbarHandle);
-          });
+          }
+        );
+
+        this.ffmpegProcess.on('close', async () => {
+            console.log(`[Download Complete]`);
+            await Downloader.saveManifest(this.options.basePath);
+        });
     }
 
     _getVideo = () => {
@@ -171,9 +167,6 @@ module.exports = class Downloader {
 
     _linkStreams = () => {
         this.ffmpegProcess.stdio[3].on('data', chunk => {
-        if (!this.progressbarHandle) {
-            this.progressbarHandle = setInterval(this._showProgress, this.options.progressbarInterval);
-        }
 
         const lines = chunk.toString().trim().split('\n');
         const args = {};
@@ -183,23 +176,5 @@ module.exports = class Downloader {
         }
         this.merged = args;
       });
-    }
-
-    _showProgress = () => {
-        if(!this.options.showProgress) return;
-        readline.cursorTo(process.stdout, 0);
-        const {toMB} = Downloader;
-    
-        process.stdout.write(`Audio  | ${(this.audio.downloaded / this.audio.total * 100).toFixed(2)}% processed `);
-        process.stdout.write(`(${toMB(this.audio.downloaded)}MB of ${toMB(this.audio.total)}MB).${' '.repeat(10)}\n`);
-    
-        process.stdout.write(`Video  | ${(this.video.downloaded / this.video.total * 100).toFixed(2)}% processed `);
-        process.stdout.write(`(${toMB(this.video.downloaded)}MB of ${toMB(this.video.total)}MB).${' '.repeat(10)}\n`);
-    
-        process.stdout.write(`Merged | processing frame ${this.merged.frame} `);
-        process.stdout.write(`(at ${this.merged.fps} fps => ${this.merged.speed}).${' '.repeat(10)}\n`);
-    
-        process.stdout.write(`running for: ${((Date.now() - this.start) / 1000 / 60).toFixed(2)} Minutes.`);
-        readline.moveCursor(process.stdout, 0, -3);
     }
 }

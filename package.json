@@ -13,7 +13,6 @@
     "dotenv-parse-variables": "^2.0.0",
     "ffmpeg-static": "^5.0.2",
     "string-sanitizer-fix": "^2.0.1",
-    "ytdl-core": "^4.11.0",
-    "zotero": "^0.4.1"
+    "ytdl-core": "^4.11.0"
   }
 }

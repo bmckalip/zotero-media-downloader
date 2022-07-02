@@ -20,29 +20,34 @@ const {
 } = env;
 
 const loop = async downloader => {
-    const urls = await getURLs({
-        ZOTERO_API_KEY, 
-        ZOTERO_USER_ID, 
-        ZOTERO_COLLECTION_NAME,
-    });
-
-    const zoteroVideoIds = urls.map(url => url.split('?v=')[1]);
-    const manifestVideoIds = Downloader.manifest.videos.map(({id}) => id);
-    const existingVideoIds = [];
-    const newVideoIds = [];
-
-    zoteroVideoIds.forEach(zvid => (manifestVideoIds.includes(zvid) ? existingVideoIds : newVideoIds).push(zvid));
-
-    DEBUG && console.log(`[Downloading] ${newVideoIds}`);
-
-    const retryMessage = `Checking again in ${CHECK_ZOTERO_INTERVAL_MINUTES} minute(s).`;
-    if(newVideoIds.length > 0){
-        console.log(`[Checking Zotero] found ${newVideoIds.length} new video(s), downloading. ${retryMessage}`);
-        for (let i = 0; i < newVideoIds.length; i++) {
-            await downloader.downloadVideo(newVideoIds[i]);
+    try {
+        const urls = await getURLs({
+            ZOTERO_API_KEY, 
+            ZOTERO_USER_ID, 
+            ZOTERO_COLLECTION_NAME,
+        });
+    
+        const zoteroVideoIds = urls.map(url => url.split('?v=')[1]);
+        const manifestVideoIds = Downloader.manifest.videos.map(({id}) => id);
+        const existingVideoIds = [];
+        const newVideoIds = [];
+    
+        zoteroVideoIds.forEach(zvid => (manifestVideoIds.includes(zvid) ? existingVideoIds : newVideoIds).push(zvid));
+    
+        DEBUG && console.log(`[Downloading] ${newVideoIds}`);
+    
+        const retryMessage = `Checking again in ${CHECK_ZOTERO_INTERVAL_MINUTES} minute(s).`;
+        if(newVideoIds.length > 0){
+            console.log(`[Checking Zotero] found ${newVideoIds.length} new video(s), downloading. ${retryMessage}`);
+            for (let i = 0; i < newVideoIds.length; i++) {
+                await downloader.downloadVideo(newVideoIds[i]);
+            }
+        } else {
+            DEBUG && console.log(`[Checking Zotero] Nothing to download. ${existingVideoIds.length} / ${zoteroVideoIds.length} up to date. ${retryMessage}`);
         }
-    } else {
-        DEBUG && console.log(`[Checking Zotero] Nothing to download. ${existingVideoIds.length} / ${zoteroVideoIds.length} up to date. ${retryMessage}`);
+    } catch(e) {
+        console.log(`[Download error occurred]`);
+        DEBUG && console.log(e);
     }
 }
 

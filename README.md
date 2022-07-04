@@ -56,3 +56,16 @@ CHECK_ZOTERO_INTERVAL_MINUTES=2
     7. Expand/Scroll to the `Request Headers` section on the right. 
     8. copy the full `cookie` request header value and paste it in your `.env` file
         ![Copy Cookie Value](./res/cookie-screenshot.png)
+
+## Changelog
+- [x] 1.0.0 release. Connects Zotero API to the downloader service. Limited customizability
+
+    
+
+## Roadmap
+
+- [x] Release working downloader service
+- [ ] Add more customizability, namely quality options, filetype options for audio (mp3)
+- [ ] improve manifest.json
+- [ ] multithreading and batching
+- [ ] add other services besides youtube

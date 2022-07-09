@@ -67,8 +67,8 @@ DRYRUN=true
 
 - [x] Release working downloader service
 - [x] add filetype options for audio (mp3)
-- [ ] add quality options
 - [ ] add youtube playlist & channel downloading support
+- [ ] add quality options
 - [ ] improve folder stucture and zotero collection structure to use nesting for better organization
 - [ ] add other services besides youtube
 - [ ] multithreading and batching

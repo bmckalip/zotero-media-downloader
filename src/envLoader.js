@@ -1,12 +1,14 @@
 const DEFAULT_ENV = {
     ZOTERO_API_KEY: "",
     ZOTERO_USER_ID: "",
-    ZOTERO_COLLECTION_NAME:"zdl",
+    ZOTERO_VIDEO_COLLECTION_NAME:"zdl_video",
+    ZOTERO_AUDIO_COLLECTION_NAME:"zdl_audio",
     YT_USER_COOKIE:"",
-    FILE_FORMAT:"mp4",
+    VIDEO_FILE_FORMAT:"mp4",
+    AUDIO_FILE_FORMAT:"mp3",
     BASE_PATH:"/",
-    SUB_DIRECTORY:"/",
     DEBUG: false,
+    DRYRUN: false,
     CHECK_ZOTERO_INTERVAL_MINUTES: 5
 } 
 

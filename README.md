@@ -1,6 +1,6 @@
-# Zotero Youtube Downloader
+# Zotero Media Downloader
 
-**A NodeJS based Youtube downloader capable of saving 4k videos from your Zotero collection to your local computer or network storage location.**
+**A NodeJS based media downloader capable of saving 4k videos from your Zotero collection to your local computer or network storage location.**
 
 This application uses ytdl-core, FFMPEG-static and the axios to interact with the [Zotero Public API](https://www.zotero.org/support/dev/web_api/v3/start) Note: You do not need to install a 3rd party version of FFMPEG to use this app.
 
@@ -14,9 +14,9 @@ this application automatically creates and manages a `manifest.json` file to tra
 
 ## Usage
 
-1. In the Zotero Desktop or Web App, create a new `collection` that matches the value you have specified in the `ZOTERO_COLLECTION_NAME` environment variable in your `.env` file. e.g. `zytdl`.
-3. run `npm run start` to launch `zotero-youtube-downloader`.
-4. While Zotero Desktop and `zotero-youtube-downloader` are running, use the Zotero Connector browser plugin to add youtube links to the specified collection.
+1. In the Zotero Desktop or Web App, create a new `collection` that matches the value you have specified in the `ZOTERO_VIDEO_COLLECTION_NAME` environment variable in your `.env` file. e.g. `zytdl`. You can also specify `ZOTERO_AUDIO_COLLECTION_NAME` in the same way.
+3. run `npm run start` to launch `zotero-media-downloader`.
+4. While Zotero Desktop and `zotero-media-downloader` are running, use the Zotero Connector browser plugin to add urls to the specified collection.
 5. Monitor the console and your specified output directory for newly downloaded videos.  
 
 ### Environment Variables
@@ -25,25 +25,31 @@ this application automatically creates and manages a `manifest.json` file to tra
 ```dosini
 ZOTERO_API_KEY=<your api key>
 ZOTERO_USER_ID=<your user id>
-ZOTERO_COLLECTION_NAME=zytdl
 ```
 
 To find your `API key` and `userID` for zotero, login to your zotero web account and navigate to https://www.zotero.org/settings/keys 
 
 1. On this page look for `"Your userID for use in API calls is <YOUR_USER_ID>"` and copy your user id to your `.env` file
 2. Create a new `API key` by clicking on `Create new private key`. Once named and configured (Defaults should be fine), click `Save Key` and copy the string to your `.env` file.
-3. create a collection in zotero to be monitored for youtube videos. Only youtube videos in this collection will be downoaded. 
+3. create a collection in zotero to be monitored for videos. Only videos in this collection will be downoaded. 
 
 #### Optional
 ```dosini
-YT_USER_COOKIE=<value from browser>
-FILE_FORMAT=mkv
+ZOTERO_VIDEO_COLLECTION_NAME=zytdlVideo
+ZOTERO_AUDIO_COLLECTION_NAME=zytdlAudio
+VIDEO_FILE_FORMAT=mkv
+AUDIO_FILE_FORMAT=flac
 BASE_PATH=C:/path/to/download/location
-DEBUG=false
-CHECK_ZOTERO_INTERVAL_MINUTES=2
+CHECK_ZOTERO_INTERVAL_MINUTES=30
+YT_USER_COOKIE=<value from browser>
+DEBUG=true
+DRYRUN=true
 ```
 
-* `FILE_FORMAT` defaults to mp4
+* `ZOTERO_VIDEO_COLLECTION_NAME` zdl_video
+* `ZOTERO_AUDIO_COLLECTION_NAME` zdl_audio
+* `VIDEO_FILE_FORMAT` defaults to mp4
+* `AUDIO_FILE_FORMAT` defaults to mp3
 * `CHECK_ZOTERO_INTERVAL_MINUTES` How often to check the zotero API for new videos to download. Defaults to 5 minutes
 * `YT_USER_COOKIE` is required to download some age-restricted videos. Without specifying this value, you will be unable to download many videos, and will see errors in the console. For best results, you should specify this variable with the full cookie value from a youtube network request in your browser.
 
@@ -55,17 +61,29 @@ CHECK_ZOTERO_INTERVAL_MINUTES=2
     6. in the chrome dev tools filter box, search for `heartbeat`, select  it in the list. (many requests will have this value, heatbeat is just an example)
     7. Expand/Scroll to the `Request Headers` section on the right. 
     8. copy the full `cookie` request header value and paste it in your `.env` file
-        ![Copy Cookie Value](./res/cookie-screenshot.png)
-
-## Changelog
-- [x] 1.0.0 release. Connects Zotero API to the downloader service. Limited customizability
-
-    
+        ![Cookie Value Location](./res/cookie-screenshot.png)
 
 ## Roadmap
 
 - [x] Release working downloader service
-- [ ] Add more customizability, namely quality options, filetype options for audio (mp3)
-- [ ] improve manifest.json
-- [ ] multithreading and batching
+- [x] add filetype options for audio (mp3)
+- [ ] add quality options
+- [ ] improve folder stucture and zotero collection structure to use nesting for better organization
 - [ ] add other services besides youtube
+- [ ] multithreading and batching
+
+## Changelog
+- [x] 1.0.0 release. Connects Zotero API to the downloader service. Limited customizability
+- [x] 1.1.0 release. Added support for Audio file downloading
+    - Added support for downloading audio streams from youtube, and saving them in a configurable audio file format.
+    - Added `Dryrun` mode
+    - Improved error handling and debugging
+    - changed package name from `zotero-youtube-downloader` to `zotero-media-downloader`
+    - removed most references to `youtube` in the `README.md` to prepare for adding more downloaders
+    - Environment variable changes
+        - added `DRYRUN`
+        - removed `SUB_DIRECTORY`
+        - renamed `ZOTERO_COLLECTION_NAME` to `ZOTERO_VIDEO_COLLECTION_NAME`
+        - added `ZOTERO_AUDIO_COLLECTION_NAME`
+        - renamed `FILE_FORMAT` to `VIDEO_FILE_FORMAT`
+        - added `AUDIO_FILE_FORMAT`

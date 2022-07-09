@@ -11,17 +11,22 @@ module.exports = class Downloader extends FFMPEGDownloader {
         } = (await ytdl.getInfo(this.videoId, this._getHeaders()))?.videoDetails;
 
         this.metaData = {
-            title: title,
-            artist: ownerChannelName,
-            comment: description,
+            title: title || "",
+            artist: ownerChannelName || "",
+            comment: description || "",
             date: new Date(publishDate).toISOString(),
             publisher: 'Youtube'
         };
     }
 
     setStreams = () => {
-        this._getYoutubeStream({name: 'audio', quality: 'highestaudio'}).pipe(this.ffmpegProcess.stdio[4]);
-        this._getYoutubeStream({name: 'video', quality: 'highestvideo'}).pipe(this.ffmpegProcess.stdio[5]);
+        if(this.options.downloadAudioStream){
+            this._getYoutubeStream({name: 'audio', quality: 'highestaudio'}).pipe(this.ffmpegProcess.stdio[4]);
+        }
+        
+        if(this.options.downloadVideoStream){
+            this._getYoutubeStream({name: 'video', quality: 'highestvideo'}).pipe(this.ffmpegProcess.stdio[5]);
+        }
     }
 
     _getYoutubeStream = ({name, quality}) => {

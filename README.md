@@ -67,7 +67,8 @@ DRYRUN=true
 
 - [x] Release working downloader service
 - [x] add filetype options for audio (mp3)
-- [ ] add youtube playlist & channel downloading support
+- [x] add youtube channel downloading support
+- [ ] add youtube playlist downloading support
 - [ ] add quality options
 - [ ] improve folder stucture and zotero collection structure to use nesting for better organization
 - [ ] add other services besides youtube
@@ -88,3 +89,4 @@ DRYRUN=true
         - added `ZOTERO_AUDIO_COLLECTION_NAME`
         - renamed `FILE_FORMAT` to `VIDEO_FILE_FORMAT`
         - added `AUDIO_FILE_FORMAT`
+- [x] 1.1.1 release. Added support for channel downloading

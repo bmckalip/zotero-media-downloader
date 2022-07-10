@@ -81,8 +81,6 @@ module.exports = class FFMPEGDownloader {
         downloadAudioStream && options.stdio.push("pipe"); //add a pipe for audio
         downloadVideoStream && options.stdio.push("pipe"); //add a pipe for video
 
-        process.env.DEBUG && console.log(`FFMPEG ARGS ${JSON.stringify(args, null, 4)}`);
-        process.env.DEBUG && console.log(`FFMPEG OPTIONS ${JSON.stringify(options, null, 4)}`);
         if(process.env.DRYRUN) return;
 
         this.ffmpegProcess = cp.spawn(ffmpeg, args, options);

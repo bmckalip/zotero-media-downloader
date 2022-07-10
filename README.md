@@ -53,20 +53,22 @@ DRYRUN=true
 * `CHECK_ZOTERO_INTERVAL_MINUTES` How often to check the zotero API for new videos to download. Defaults to 5 minutes
 * `YT_USER_COOKIE` is required to download some age-restricted videos. Without specifying this value, you will be unable to download many videos, and will see errors in the console. For best results, you should specify this variable with the full cookie value from a youtube network request in your browser.
 
-    1. open chrome
-    2. navigate to youtube and login to your (age-unrestricted) account.
-    3. press `f12` or right click the page, and select `inspect element`
-    4. select the `network` tab in chrome dev tools
-    5. navigate to any youtube video in your browser
-    6. in the chrome dev tools filter box, search for `heartbeat`, select  it in the list. (many requests will have this value, heatbeat is just an example)
-    7. Expand/Scroll to the `Request Headers` section on the right. 
-    8. copy the full `cookie` request header value and paste it in your `.env` file
-        ![Cookie Value Location](./res/cookie-screenshot.png)
+    - open chrome
+    - navigate to youtube and login to your (age-unrestricted) account.
+    - press `f12` or right click the page, and select `inspect element`
+    - select the `network` tab in chrome dev tools
+    - navigate to any youtube video in your browser
+    - in the chrome dev tools filter box, search for `heartbeat`, select  it in the list. (many requests will have this value, heatbeat is just an example)
+    - Expand/Scroll to the `Request Headers` section on the right. 
+    - copy the full `cookie` request header value and paste it in your `.env` file
+    - ![Cookie Value Location](./res/cookie-screenshot.png)
 
 ## Roadmap
 
 - [x] Release working downloader service
 - [x] add filetype options for audio (mp3)
+- [x] add youtube channel downloading support
+- [ ] add youtube playlist downloading support
 - [ ] add quality options
 - [ ] improve folder stucture and zotero collection structure to use nesting for better organization
 - [ ] add other services besides youtube
@@ -87,3 +89,4 @@ DRYRUN=true
         - added `ZOTERO_AUDIO_COLLECTION_NAME`
         - renamed `FILE_FORMAT` to `VIDEO_FILE_FORMAT`
         - added `AUDIO_FILE_FORMAT`
+- [x] 1.1.1 release. Added support for channel downloading

@@ -12,12 +12,19 @@ module.exports = class YoutubeDownloader extends FFMPEGDownloader {
             const myURL = new URL(urlString);
             const playlistId = myURL.searchParams.get('list');
             const videoId = myURL.searchParams.get('v');
-            const channelName = myURL?.pathname?.split("/c/")[1]?.split("/")[0];
+            let channel = null;
 
-            if(playlistId){
+            if(myURL?.pathname.includes("/channel/")){
+                channel = myURL?.pathname?.split("/channel/")[1]?.split("/")[0]; 
+                ids = [...ids, ...(await YoutubeDownloader.getVideoIdsFromChannel(channel, 1))];
+            } else if(myURL?.pathname.includes("/user/")){
+                channel = myURL?.pathname?.split("/user/")[1]?.split("/")[0]; 
+                ids = [...ids, ...(await YoutubeDownloader.getVideoIdsFromChannel(channel, 2))];
+            } else if(myURL?.pathname.includes("/c/")){
+                channel = myURL?.pathname?.split("/c/")[1]?.split("/")[0]; 
+                ids = [...ids, ...(await YoutubeDownloader.getVideoIdsFromChannel(channel, 3))];
+            } else if(playlistId){
                 ids = [...ids, ...(await YoutubeDownloader.getVideoIdsFromPlaylist(playlistId))];
-            } else if(channelName){
-                ids = [...ids, ...(await YoutubeDownloader.getVideoIdsFromChannel(channelName))];
             } else if(videoId){
                 ids.push(videoId);
             }
@@ -25,18 +32,33 @@ module.exports = class YoutubeDownloader extends FFMPEGDownloader {
         return ids;
     }
 
-    static getVideoIdsFromChannel = async channelId => {
-        try {
-            const {items, alertMessage} = await ytch.getChannelVideos({channelId, channelIdType: 3});
-            if(alertMessage) {
-                throw new Error(alertMessage);
-            } else {
-                return items?.map(({videoId}) => videoId) || [];
+    static getVideoIdsFromChannel = async (channelId, channelIdType) => {
+        const recurse = async (accumulator=[], cont=null) => {
+            try {
+                let res;
+                if(accumulator.length == 0){
+                    res = await ytch.getChannelVideos({channelId, channelIdType});
+                } else if(cont){
+                    res = await ytch.getChannelVideosMore({continuation: cont   });
+                } else {
+                    return accumulator;
+                }
+
+                const {items, alertMessage, continuation} = res;
+                if(alertMessage){
+                    throw new Error(alertMessage);
+                } else {
+                    const videoIds = items?.map(({videoId}) => videoId);
+                    return await recurse([...accumulator, ...videoIds], continuation);
+                }
+            } catch(e) {
+                console.log("An error occured while getting channel videos");
+                process.env.DEBUG && console.log(e);
+                return accumulator;
             }
-        } catch(e) {
-            console.log("An error occured while getting channel videos");
-            process.env.DEBUG && console.log(e);
         }
+
+        return await recurse();
     }
 
     static getVideoIdsFromPlaylist = async playlistId => {
@@ -53,13 +75,13 @@ module.exports = class YoutubeDownloader extends FFMPEGDownloader {
     }
 
     setMetaData = async () => {
+        const res = await ytdl.getBasicInfo(this.videoId, this._getHeaders());
         const {
             title, 
             ownerChannelName, 
             description, 
             publishDate
-        } = (await ytdl.getInfo(this.videoId, this._getHeaders()))?.videoDetails;
-
+        } = res?.videoDetails;
         this.metaData = {
             title: title || "",
             artist: ownerChannelName || "",
@@ -87,5 +109,13 @@ module.exports = class YoutubeDownloader extends FFMPEGDownloader {
         return stream;
     }
 
-    _getHeaders = () => ({requestOptions: {headers: {cookie: process.env.YT_USER_COOKIE}}})
+    _getHeaders = () => (
+        {
+            requestOptions: {
+                headers: {
+                    cookie: process.env.YT_USER_COOKIE
+                }
+            }
+        }
+    )
 }

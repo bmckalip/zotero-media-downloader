@@ -68,15 +68,16 @@ DRYRUN=true
 - [x] Release working downloader service
 - [x] add filetype options for audio (mp3)
 - [x] add youtube channel downloading support
-- [ ] add youtube playlist downloading support
 - [ ] add quality options
+- [ ] investigate if this tool can be turned into a zotero plugin
 - [ ] improve folder stucture and zotero collection structure to use nesting for better organization
+- [ ] add youtube playlist downloading support
 - [ ] add other services besides youtube
-- [ ] multithreading and batching
+- [ ] multithreading, batching, and proxies
 
 ## Changelog
-- [x] 1.0.0 release. Connects Zotero API to the downloader service. Limited customizability
-- [x] 1.1.0 release. Added support for Audio file downloading
+- [x] **1.0.0** Connects Zotero API to the downloader service. Limited customizability
+- [x] **1.1.0** Added support for Audio file downloading
     - Added support for downloading audio streams from youtube, and saving them in a configurable audio file format.
     - Added `Dryrun` mode
     - Improved error handling and debugging
@@ -89,4 +90,7 @@ DRYRUN=true
         - added `ZOTERO_AUDIO_COLLECTION_NAME`
         - renamed `FILE_FORMAT` to `VIDEO_FILE_FORMAT`
         - added `AUDIO_FILE_FORMAT`
-- [x] 1.1.1 release. Added support for channel downloading
+- [x] **1.1.1** Added support for channel downloading
+- [x] **1.1.2** Bugfixes and improvements for channel downloading
+    - fixed bug where downloading channels with different YT url structures would not work (now supports /user/ and /channel/)
+    - fixed a bug where only the latest 30 videos from a channel would be downloaded. Now all are downloaded.

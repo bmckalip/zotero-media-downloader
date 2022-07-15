@@ -33,10 +33,13 @@ module.exports = class YoutubeDownloader extends FFMPEGDownloader {
     }
 
     static getVideoIdsFromChannel = async (channelId, channelIdType) => {
+        const max = process.env.CHANNEL_DOWNLOAD_MAX_DEPTH;
         const recurse = async (accumulator=[], cont=null) => {
             try {
                 let res;
-                if(accumulator.length == 0){
+                if(max != -1 && accumulator.length >= max){
+                    return accumulator;
+                } else if(accumulator.length == 0){
                     res = await ytch.getChannelVideos({channelId, channelIdType});
                 } else if(cont){
                     res = await ytch.getChannelVideosMore({continuation: cont   });
@@ -58,7 +61,8 @@ module.exports = class YoutubeDownloader extends FFMPEGDownloader {
             }
         }
 
-        return await recurse();
+        const videoIds = await recurse();
+        return max == -1 ? videoIds : videoIds.slice(0, max);
     }
 
     static getVideoIdsFromPlaylist = async playlistId => {

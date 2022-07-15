@@ -8,7 +8,8 @@ const DEFAULT_ENV = {
     BASE_PATH:"/",
     DEBUG: false,
     DRYRUN: false,
-    CHECK_ZOTERO_INTERVAL_MINUTES: 5
+    CHECK_ZOTERO_INTERVAL_MINUTES: 5,
+    CHANNEL_DOWNLOAD_MAX_DEPTH: -1
 } 
 
 module.exports = () => {

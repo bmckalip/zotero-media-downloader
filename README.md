@@ -44,6 +44,7 @@ CHECK_ZOTERO_INTERVAL_MINUTES=30
 YT_USER_COOKIE=<value from browser>
 DEBUG=true
 DRYRUN=true
+CHANNEL_DOWNLOAD_MAX_DEPTH
 ```
 
 * `ZOTERO_VIDEO_COLLECTION_NAME` zdl_video
@@ -51,6 +52,7 @@ DRYRUN=true
 * `VIDEO_FILE_FORMAT` defaults to mp4
 * `AUDIO_FILE_FORMAT` defaults to mp3
 * `CHECK_ZOTERO_INTERVAL_MINUTES` How often to check the zotero API for new videos to download. Defaults to 5 minutes
+* `CHANNEL_DOWNLOAD_MAX_DEPTH` maximum number of videos that will be downloaded from a channel. Defaults to -1 (meaning no limit).
 * `YT_USER_COOKIE` is required to download some age-restricted videos. Without specifying this value, you will be unable to download many videos, and will see errors in the console. For best results, you should specify this variable with the full cookie value from a youtube network request in your browser.
 
     - open chrome
@@ -91,6 +93,8 @@ DRYRUN=true
         - renamed `FILE_FORMAT` to `VIDEO_FILE_FORMAT`
         - added `AUDIO_FILE_FORMAT`
 - [x] **1.1.1** Added support for channel downloading
-- [x] **1.1.2** Bugfixes and improvements for channel downloading
-    - fixed bug where downloading channels with different YT url structures would not work (now supports /user/ and /channel/)
-    - fixed a bug where only the latest 30 videos from a channel would be downloaded. Now all are downloaded.
+- [x] **1.1.2** 
+    - Bugfixes and improvements for channel downloading
+        - fixed bug where downloading channels with different YT url structures would not work (now supports /user/ and /channel/)
+        - fixed a bug where only the latest 30 videos from a channel would be downloaded. Now all are downloaded.
+    - Added envionment variable `CHANNEL_DOWNLOAD_MAX_DEPTH` to limit maximum number videos that can be downloaded from a channel

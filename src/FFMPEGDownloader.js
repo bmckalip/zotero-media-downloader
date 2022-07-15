@@ -25,7 +25,6 @@ module.exports = class FFMPEGDownloader {
     download = async () => {
         try {
             await this.setMetaData();
-
             this.filepath = path.join(
                 process.env.BASE_PATH, 
                 `${sanitize.addUnderscore(this.metaData.title)} ${this.videoId || ""}.${this.options.fileFormat}`.trim()
@@ -84,7 +83,6 @@ module.exports = class FFMPEGDownloader {
         if(process.env.DRYRUN) return;
 
         this.ffmpegProcess = cp.spawn(ffmpeg, args, options);
-        
         this.ffmpegProcess.on('close', async () => {
             console.log(`[Download Complete]`);
             await ManifestManager.saveManifest();

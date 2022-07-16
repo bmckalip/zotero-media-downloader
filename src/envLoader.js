@@ -9,7 +9,8 @@ const DEFAULT_ENV = {
     DEBUG: false,
     DRYRUN: false,
     CHECK_ZOTERO_INTERVAL_MINUTES: 5,
-    CHANNEL_DOWNLOAD_MAX_DEPTH: -1
+    CHANNEL_DOWNLOAD_MAX_DEPTH: -1,
+    DOWNLOAD_BATCH_SIZE: 5
 } 
 
 module.exports = () => {

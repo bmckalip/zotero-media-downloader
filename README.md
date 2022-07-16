@@ -53,6 +53,7 @@ CHANNEL_DOWNLOAD_MAX_DEPTH=50
 * `AUDIO_FILE_FORMAT` defaults to mp3
 * `CHECK_ZOTERO_INTERVAL_MINUTES` How often to check the zotero API for new videos to download. Defaults to 5 minutes
 * `CHANNEL_DOWNLOAD_MAX_DEPTH` maximum number of videos that will be downloaded from a channel. Defaults to -1 (meaning no limit).
+* `DOWNLOAD_BATCH_SIZE` maximum number of videos to download simultaneously. Defaults to 5.
 * `YT_USER_COOKIE` is required to download some age-restricted videos. Without specifying this value, you will be unable to download many videos, and will see errors in the console. For best results, you should specify this variable with the full cookie value from a youtube network request in your browser.
 
     - open chrome
@@ -70,12 +71,13 @@ CHANNEL_DOWNLOAD_MAX_DEPTH=50
 - [x] Release working downloader service
 - [x] add filetype options for audio (mp3)
 - [x] add youtube channel downloading support
+- [X] download batching
 - [ ] add quality options
 - [ ] investigate if this tool can be turned into a zotero plugin
 - [ ] improve folder stucture and zotero collection structure to use nesting for better organization
 - [ ] add youtube playlist downloading support
 - [ ] add other services besides youtube
-- [ ] multithreading, batching, and proxies
+- [ ] multithreading, proxies
 
 ## Changelog
 - [x] **1.0.0** Connects Zotero API to the downloader service. Limited customizability
@@ -98,3 +100,4 @@ CHANNEL_DOWNLOAD_MAX_DEPTH=50
         - fixed bug where downloading channels with different YT url structures would not work (now supports /user/ and /channel/)
         - fixed a bug where only the latest 30 videos from a channel would be downloaded. Now all are downloaded.
     - Added envionment variable `CHANNEL_DOWNLOAD_MAX_DEPTH` to limit maximum number videos that can be downloaded from a channel
+- [X] **1.1.3** implemented download batching

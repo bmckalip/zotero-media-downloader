@@ -1,7 +1,7 @@
 const loadEnv = require('./envLoader');
 const DownloadManager = require('./DownloadManager');
 
-const loop = () => {
+const updateDownloadQueue = async () => {
     const {
         ZOTERO_VIDEO_COLLECTION_NAME,
         ZOTERO_AUDIO_COLLECTION_NAME,
@@ -10,7 +10,7 @@ const loop = () => {
     }  = process.env;
 
     if(ZOTERO_VIDEO_COLLECTION_NAME){
-        DownloadManager.downloadCollection(
+        await DownloadManager.addCollectionToQueue(
             DownloadManager.DOWNLOADERS.YOUTUBE, 
             ZOTERO_VIDEO_COLLECTION_NAME,
             {fileFormat: VIDEO_FILE_FORMAT}
@@ -18,7 +18,7 @@ const loop = () => {
     }
 
     if(ZOTERO_AUDIO_COLLECTION_NAME){
-        DownloadManager.downloadCollection(
+        await DownloadManager.addCollectionToQueue(
             DownloadManager.DOWNLOADERS.YOUTUBE, 
             ZOTERO_AUDIO_COLLECTION_NAME,
             {fileFormat: AUDIO_FILE_FORMAT, downloadVideoStream: false}
@@ -31,6 +31,8 @@ module.exports = async () => {
     const { CHECK_ZOTERO_INTERVAL_MINUTES, DRYRUN }  = process.env;
     await DownloadManager.buildManifest();
     DRYRUN && console.log(`[DRYRUN] no videos will be downloaded and the manifest will not be changed. The Zotero API will still be accessed.`)
-    setInterval(loop, CHECK_ZOTERO_INTERVAL_MINUTES * 60 * 1000);
-    loop();
+    
+    setInterval(updateDownloadQueue, CHECK_ZOTERO_INTERVAL_MINUTES * 60 * 1000);
+    updateDownloadQueue();
+    await DownloadManager.downloadAll()
 };

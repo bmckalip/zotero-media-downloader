@@ -30,19 +30,14 @@ module.exports = class FFMPEGDownloader {
                 `${sanitize.addUnderscore(this.metaData.title)} ${this.videoId || ""}.${this.options.fileFormat}`.trim()
             );
 
-            console.log(`[Initiating Download] ${this.filepath}`);
-            ManifestManager.addToManifest({
-                id: this.videoId,
-                dateDownloaded: new Date().toISOString(),
-                ...this.metaData
-            });
+            console.log(`[Initiating Download] ${this.metaData.title}`);
 
             this._launchFFMPEG();
             if(process.env.DRYRUN) return;
             this.setStreams();
             this._linkStreams();
         } catch(e) {
-            console.log("[Download Failed]");
+            console.log(`[Download Failed] ${this.metaData.title}`);
             console.log(e);
         }
     }
@@ -84,12 +79,19 @@ module.exports = class FFMPEGDownloader {
 
         this.ffmpegProcess = cp.spawn(ffmpeg, args, options);
         this.ffmpegProcess.on('close', async () => {
-            console.log(`[Download Complete]`);
+            console.log(`[Download Complete] ${this.metaData.title}`);
+
+            ManifestManager.addToManifest({
+                id: this.videoId,
+                dateDownloaded: new Date().toISOString(),
+                ...this.metaData
+            });
+            
             await ManifestManager.saveManifest();
         });
 
         this.ffmpegProcess.on('error', async e => {
-            console.log("[FFMPEG ERROR]");
+            console.log(`[FFMPEG ERROR] ${this.metaData.title} - failed to download`);
             process.env.DEBUG && console.log(e);
         });
     }

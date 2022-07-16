@@ -70,12 +70,13 @@ CHANNEL_DOWNLOAD_MAX_DEPTH=50
 - [x] Release working downloader service
 - [x] add filetype options for audio (mp3)
 - [x] add youtube channel downloading support
+- [ ] batching
 - [ ] add quality options
 - [ ] investigate if this tool can be turned into a zotero plugin
 - [ ] improve folder stucture and zotero collection structure to use nesting for better organization
 - [ ] add youtube playlist downloading support
 - [ ] add other services besides youtube
-- [ ] multithreading, batching, and proxies
+- [ ] multithreading, proxies
 
 ## Changelog
 - [x] **1.0.0** Connects Zotero API to the downloader service. Limited customizability

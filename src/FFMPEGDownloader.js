@@ -3,6 +3,7 @@ const ffmpeg = require('ffmpeg-static');
 const {sanitize} = require('string-sanitizer-fix');
 const path = require('path');
 const ManifestManager = require('./ManifestManager');
+const DOWNLOAD_STATUS = require('./DownloadStatuses');
 
 module.exports = class FFMPEGDownloader {
     static DEFAULT_OPTIONS = {
@@ -20,24 +21,25 @@ module.exports = class FFMPEGDownloader {
         this.audio = { downloaded: 0, total: Infinity };
         this.video = { downloaded: 0, total: Infinity };
         this.merged = { frame: 0, speed: '0x', fps: 0 };
+        this.status = DOWNLOAD_STATUS.UNDOWNLOADED;
     }
 
     download = async () => {
         try {
             await this.setMetaData();
+            
             this.filepath = path.join(
                 process.env.BASE_PATH, 
                 `${sanitize.addUnderscore(this.metaData.title)} ${this.videoId || ""}.${this.options.fileFormat}`.trim()
             );
-
-            console.log(`[Initiating Download] ${this.metaData.title}`);
-
+    
             this._launchFFMPEG();
             if(process.env.DRYRUN) return;
             this.setStreams();
             this._linkStreams();
         } catch(e) {
-            console.log(`[Download Failed] ${this.metaData.title}`);
+            console.log(`[Download Failed] ${this?.metadata?.title || this.videoId}`);
+            this.status = DOWNLOAD_STATUS.FAILED;
             console.log(e);
         }
     }
@@ -78,9 +80,13 @@ module.exports = class FFMPEGDownloader {
         if(process.env.DRYRUN) return;
 
         this.ffmpegProcess = cp.spawn(ffmpeg, args, options);
+
+        console.log(`[Downloading] ${this.metaData.title}`);
+        this.status = DOWNLOAD_STATUS.DOWNLOADING;
+
         this.ffmpegProcess.on('close', async () => {
             console.log(`[Download Complete] ${this.metaData.title}`);
-
+            this.status = DOWNLOAD_STATUS.DOWNLOADED;
             ManifestManager.addToManifest({
                 id: this.videoId,
                 dateDownloaded: new Date().toISOString(),
@@ -92,6 +98,7 @@ module.exports = class FFMPEGDownloader {
 
         this.ffmpegProcess.on('error', async e => {
             console.log(`[FFMPEG ERROR] ${this.metaData.title} - failed to download`);
+            this.status = DOWNLOAD_STATUS.FAILED;
             process.env.DEBUG && console.log(e);
         });
     }

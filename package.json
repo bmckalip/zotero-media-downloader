@@ -3,7 +3,7 @@
   "version": "1.1.2",
   "description": "A NodeJS based downloader capable of saving 4k videos from your Zotero collection to your local computer or network storage location.",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node ./server.js"
   },
   "author": "Brian McKalip",
   "license": "ISC",
@@ -15,6 +15,6 @@
     "string-sanitizer-fix": "^2.0.1",
     "youtube-playlist": "^1.0.4",
     "yt-channel-info": "^3.0.4",
-    "ytdl-core": "^4.11.0"
+    "ytdl-core": "4.11.1"
   }
 }

@@ -2,9 +2,9 @@ const ytdl = require('ytdl-core');
 const ytpl = require('youtube-playlist');
 const ytch = require('yt-channel-info');
 
-const FFMPEGDownloader = require('../FFMPEGDownloader');
+const FFMPEGDriver = require('../FFMPEGDriver');
 
-module.exports = class YoutubeDownloader extends FFMPEGDownloader {
+module.exports = class YoutubeDownloader extends FFMPEGDriver {
     static getVideoIdsFromCollection = async collection => {
         let ids = [];
         for (let i = 0; i < collection.length; i++) {

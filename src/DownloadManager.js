@@ -1,7 +1,7 @@
 const axios = require('axios').default;
 const ManifestManager = require('./ManifestManager');
 const YoutubeDownloader = require('./Downloaders/YoutubeDownloader');
-const DOWNLOAD_STATUS = require('./DownloadStatuses');
+const {DOWNLOAD_STATUS} = require('./constants');
 
 module.exports = class DownloadManager {
     static downloadQueue = [];
@@ -132,5 +132,30 @@ module.exports = class DownloadManager {
         }
 
         setTimeout(DownloadManager.downloadAll, 5000);
+    }
+
+    static updateDownloadQueue = async () => {
+        const {
+            ZOTERO_VIDEO_COLLECTION_NAME,
+            ZOTERO_AUDIO_COLLECTION_NAME,
+            VIDEO_FILE_FORMAT,
+            AUDIO_FILE_FORMAT,
+        }  = process.env;
+    
+        if(ZOTERO_VIDEO_COLLECTION_NAME){
+            await DownloadManager.addCollectionToQueue(
+                DownloadManager.DOWNLOADERS.YOUTUBE, 
+                ZOTERO_VIDEO_COLLECTION_NAME,
+                {fileFormat: VIDEO_FILE_FORMAT}
+            );
+        }
+    
+        if(ZOTERO_AUDIO_COLLECTION_NAME){
+            await DownloadManager.addCollectionToQueue(
+                DownloadManager.DOWNLOADERS.YOUTUBE, 
+                ZOTERO_AUDIO_COLLECTION_NAME,
+                {fileFormat: AUDIO_FILE_FORMAT, downloadVideoStream: false}
+            );
+        }
     }
 }

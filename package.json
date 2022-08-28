@@ -1,16 +1,15 @@
 {
   "name": "zotero-media-downloader",
-  "version": "1.1.2",
-  "description": "A NodeJS based downloader capable of saving 4k videos from your Zotero collection to your local computer or network storage location.",
+  "version": "1.2.0",
+  "description": "A NodeJS based downloader capable of saving 4k videos from your Zotero collection to your local computer or network storage location using FFmpeg.",
   "scripts": {
-    "start": "node ./server.js"
+    "start": "node ./src/index.js"
   },
+  "main": "src",
   "author": "Brian McKalip",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",
-    "dotenv": "^16.0.1",
-    "dotenv-parse-variables": "^2.0.0",
     "ffmpeg-static": "^5.0.2",
     "string-sanitizer-fix": "^2.0.1",
     "youtube-playlist": "^1.0.4",

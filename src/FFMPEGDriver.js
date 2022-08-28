@@ -3,9 +3,9 @@ const ffmpeg = require('ffmpeg-static');
 const {sanitize} = require('string-sanitizer-fix');
 const path = require('path');
 const ManifestManager = require('./ManifestManager');
-const DOWNLOAD_STATUS = require('./DownloadStatuses');
+const {DOWNLOAD_STATUS} = require('./constants');
 
-module.exports = class FFMPEGDownloader {
+module.exports = class FFMPEGDriver {
     static DEFAULT_OPTIONS = {
         downloadVideoStream: true,
         downloadAudioStream: true,
@@ -14,7 +14,7 @@ module.exports = class FFMPEGDownloader {
 
     constructor(videoId, options={}){
         this.videoId = videoId;
-        this.options = {...FFMPEGDownloader.DEFAULT_OPTIONS, ...options};
+        this.options = {...FFMPEGDriver.DEFAULT_OPTIONS, ...options};
         this.metaData = {};
 
         this.start = Date.now();

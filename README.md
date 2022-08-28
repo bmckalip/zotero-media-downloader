@@ -138,5 +138,7 @@ If you need more control over how and when downloading occurs, you can import th
     - Added envionment variable `CHANNEL_DOWNLOAD_MAX_DEPTH` to limit maximum number videos that can be downloaded from a channel
 - [X] **1.1.3** implemented download batching
 - [X] **1.2.0** distributed as an NPM package, Changed Usage. Eliminated Environment variables to support new package distribution method.
+- [x] **1.2.1** added registry to package.json
+- [x] **1.2.2** fixed url in registry package.json
 
 ***

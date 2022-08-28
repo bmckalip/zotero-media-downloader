@@ -1,9 +1,13 @@
 {
   "name": "zotero-media-downloader",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "A NodeJS based downloader capable of saving 4k videos from your Zotero collection to your local computer or network storage location using FFmpeg.",
   "scripts": {
     "start": "node ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bmckalip/zotero-media-downloader.git"
   },
   "main": "src",
   "author": "Brian McKalip",

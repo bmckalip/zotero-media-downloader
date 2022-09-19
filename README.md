@@ -13,14 +13,14 @@ this application automatically creates and manages a `manifest.json` file to tra
 1. in your project, run this command: `npm install zotero-media-downloader`
 2. to run zdl as a standalone server, import `config` and `run` functions from the package, and use them in the following way:
 ```js
-const { config, run } = require('zotero-media-downloader');
+const { config, start } = require('zotero-media-downloader');
 
 const main() {
     config({
         ZOTERO_API_KEY: "<your-zotero-api-key>",
         ZOTERO_USER_ID: "<your-zotero-user-id>"
     });
-    run();
+    start();
 }
 
 main();
@@ -48,9 +48,10 @@ Note: some of these values like `ZOTERO_API_KEY`, `ZOTERO_USER_ID`, and `YT_USER
 | BASE_PATH                        | String    | no       | "/"           | Path to the location you wish downoaded content to be saved in. Can be an absolute or relative path. |
 | DEBUG                            | Boolean   | no       | false         | Prints additional console information. |
 | DRYRUN                           | Boolean   | no       | false         | Will prevent any videos rom actually being downloaded. Zotero API will still be accessed like normal |
-| CHECK_ZOTERO_INTERVAL_MINUTES    | Number    | no       | 5             | This is the number in minutes that zotero will be polled for new videos in the specified collections |
+| LOOP_INTERVAL_MINUTES            | Number    | no       | 5             | This is the number in minutes that zotero will be polled for new videos in the specified collections |
 | CHANNEL_DOWNLOAD_MAX_DEPTH       | Number    | no       | -1            | If channel links are detected in the collection, this value refers to the max number of most recent videos to download from the channel. |
 | DOWNLOAD_BATCH_SIZE              | Boolean   | no       | 5             | The number of videos to download simulaneously. This value should be increased or decreased depending on the speed of your internet connection. |
+| PRESERVE_LOG                     | Boolean   | no       | false         | If set to true, prevent the console output from clearing after each loop | 
 
 ***
 
@@ -80,18 +81,18 @@ To find your `API key` and `userID` for zotero, login to your zotero web account
 If you need more control over how and when downloading occurs, you can import the DownloadManager class directly and use it as required. Note: the config function automatically injects your config into process.env
 
 ```js
-    const {config, DownloadManager} = require('zotero-media-downloader');
+    const {config, loop, DownloadManager} = require('zotero-media-downloader');
     const main customUsage = async () => {
         config({
             ZOTERO_API_KEY: "<your-zotero-api-key>",
             ZOTERO_USER_ID: "<your-zotero-user-id>"
         });
-        const { CHECK_ZOTERO_INTERVAL_MINUTES, DRYRUN }  = process.env;
+
+        const { LOOP_INTERVAL_MINUTES, DRYRUN }  = process.env;
         await DownloadManager.buildManifest();
         DRYRUN && console.log(`[DRYRUN] no videos will be downloaded and the manifest will not be changed. The Zotero API will still be accessed.`)
-        setInterval(DownloadManager.updateDownloadQueue, CHECK_ZOTERO_INTERVAL_MINUTES * 60 * 1000);
-        DownloadManager.updateDownloadQueue();
-        await DownloadManager.downloadAll();
+        setInterval(loop, LOOP_INTERVAL_MINUTES * 60 * 1000);
+        loop();
     }
 
     customUsage();
@@ -140,5 +141,6 @@ If you need more control over how and when downloading occurs, you can import th
 - [X] **1.2.0** distributed as an NPM package, Changed Usage. Eliminated Environment variables to support new package distribution method.
 - [x] **1.2.1** added registry to package.json
 - [x] **1.2.2** fixed url in registry package.json
+- [x] **1.3.0** BREAKING CHANGE: "run" renamed to "start", improved logging.
 
 ***

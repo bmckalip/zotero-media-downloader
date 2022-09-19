@@ -141,6 +141,6 @@ If you need more control over how and when downloading occurs, you can import th
 - [X] **1.2.0** distributed as an NPM package, Changed Usage. Eliminated Environment variables to support new package distribution method.
 - [x] **1.2.1** added registry to package.json
 - [x] **1.2.2** fixed url in registry package.json
-- [x] **1.2.3** improved logging and exports (usage)
+- [x] **1.3.0** BREAKING CHANGE: "run" renamed to "start", improved logging.
 
 ***

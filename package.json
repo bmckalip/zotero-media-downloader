@@ -9,6 +9,7 @@
     "type": "git",
     "url": "https://github.com/bmckalip/zotero-media-downloader.git"
   },
+  "keywords": ["zotero", "media", "downloader", "youtube", "ytdl", "plugin", "video", "download", "ffmpeg", "4k", "node"],
   "main": "src",
   "author": "Brian McKalip",
   "license": "ISC",

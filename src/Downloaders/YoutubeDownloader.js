@@ -55,8 +55,8 @@ module.exports = class YoutubeDownloader extends FFMPEGDriver {
                     return await recurse([...accumulator, ...videoIds], continuation);
                 }
             } catch(e) {
-                console.log("An error occured while getting channel videos");
-                process.env.DEBUG && console.log(e);
+                process.env.DEBUG && console.log(`An error occured while getting videos for the channel "${channelId}". The channel may not exist, or may be banned.`);
+                process.env.DEBUG && process.env.VERBOSE && console.log(e);
                 return accumulator;
             }
         }

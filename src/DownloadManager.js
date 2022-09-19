@@ -54,14 +54,15 @@ module.exports = class DownloadManager {
 
     static addCollectionToQueue = async (Downloader, collectionName, options) => {
         const { 
-            DEBUG, 
-            CHECK_ZOTERO_INTERVAL_MINUTES
+            DEBUG,
+            VERBOSE,
+            LOOP_INTERVAL_MINUTES
         } = process.env;
     
         try {
             const existingVideoIds = [];
             const newVideoIds = [];
-            const retryMessage = `Checking again in ${CHECK_ZOTERO_INTERVAL_MINUTES} minute(s).`;
+            const retryMessage = `Checking again in ${LOOP_INTERVAL_MINUTES} minute(s).`;
 
             const manifestVideoIds = ManifestManager.manifest.videos.map(({id}) => id);
             const collection = await DownloadManager.getZoteroUrls(collectionName);
@@ -80,11 +81,11 @@ module.exports = class DownloadManager {
 
             if(newVideoIds.length > 0){
                 console.log(`[Checking ${collectionName}] found ${newVideoIds.length} new video(s), adding to Queue. ${retryMessage}`);
-                DEBUG && console.log(`[Added IDs to Queue] ${JSON.stringify(newVideoIds)}`);
+                DEBUG && VERBOSE && console.log(`[Added IDs to Queue] ${JSON.stringify(newVideoIds)}`);
             } else {
                 DEBUG && console.log(`[Checking ${collectionName}] up to date. ${retryMessage}`);
                 DEBUG && console.log(`New Videos: ${newVideoIds.length} | Existing Videos: ${existingVideoIds.length} | Total in ${collectionName} Collection: ${zoteroVideoIds.length}`);
-                DEBUG && console.log(`Existing Video IDs: ${JSON.stringify(zoteroVideoIds, null, 4)}`);
+                DEBUG && VERBOSE && console.log(`Existing Video IDs: ${JSON.stringify(zoteroVideoIds, null, 4)}`);
             }
         } catch(e) {
             console.log(`[Error occured while adding to queue]`);
@@ -117,10 +118,17 @@ module.exports = class DownloadManager {
         });
 
         if(DEBUG){
-            console.log(`undownloaded: ${undownloaded.length}`);
-            console.log(`downloading: ${downloading.length}`);
-            console.log(`downloaded: ${downloaded.length}`);
-            console.log(`failed: ${failed.length}`);
+            !process.env.PRESERVE_LOG && console.clear();
+            console.log("Download Statuses: ")
+            console.table(
+                [{
+                    "Undownloaded": undownloaded.length,
+                    "Downloading": downloading.length,
+                    "Downloaded": downloaded.length,
+                    "Failed": failed.length
+                }],
+                ["Undownloaded", "Downloading", "Downloaded", "Failed"]
+            )
         }
 
         if(undownloaded.length > 0){
@@ -130,8 +138,6 @@ module.exports = class DownloadManager {
                 downloader?.download && await downloader.download();
             }
         }
-
-        setTimeout(DownloadManager.downloadAll, 5000);
     }
 
     static updateDownloadQueue = async () => {

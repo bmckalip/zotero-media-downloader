@@ -4,6 +4,7 @@ const {sanitize} = require('string-sanitizer-fix');
 const path = require('path');
 const ManifestManager = require('./ManifestManager');
 const {DOWNLOAD_STATUS} = require('./constants');
+const fs = require('fs');
 
 module.exports = class FFMPEGDriver {
     static DEFAULT_OPTIONS = {
@@ -32,7 +33,12 @@ module.exports = class FFMPEGDriver {
                 process.env.BASE_PATH, 
                 `${sanitize.addUnderscore(this.metaData.title)} ${this.videoId || ""}.${this.options.fileFormat}`.trim()
             );
-    
+
+            //delete the file if it exists - it is likely corrupted or paritally downloaded
+            if(!process.env.DRYRUN && await fs.existsSync(this.filepath)){
+                await fs.unlinkSync(this.filepath);
+            }
+
             this._launchFFMPEG();
             if(process.env.DRYRUN) return;
             this.setStreams();
@@ -58,6 +64,7 @@ module.exports = class FFMPEGDriver {
             downloadVideoStream
         } = this.options;
         const args = [
+            '-xerror',
             '-loglevel', '8', '-hide_banner', // Remove ffmpeg's console spamming
             '-progress', 'pipe:3', // Redirect/Enable progress messages
             ...(downloadAudioStream ? ['-i', 'pipe:4'] : []), // set audio input
@@ -70,16 +77,26 @@ module.exports = class FFMPEGDriver {
         ];
 
         const options = {
-            windowsHide: true,
+            // windowsHide: true,
+            detached: true,
             stdio: [ 'inherit', 'inherit', 'inherit', 'pipe'] //Standard: stdin, stdout, stderr; Custom: progress
+            // stdio: [ 'inherit', 'inherit', 'pipe', 'pipe'] //Standard: stdin, stdout, stderr; Custom: progress
         };
 
         downloadAudioStream && options.stdio.push("pipe"); //add a pipe for audio
         downloadVideoStream && options.stdio.push("pipe"); //add a pipe for video
+        
 
         if(process.env.DRYRUN) return;
 
         this.ffmpegProcess = cp.spawn(ffmpeg, args, options);
+
+        // this.ffmpegProcess.stdio[2].on('data', err => {
+        //     console.log(err.toString());
+        //     console.log("HELLO");
+        //     // this.ffmpegProcess.kill('SIGKILL');
+        //     kill(this.ffmpegProcess.pid, 'SIGKILL');
+        // })
 
         console.log(`[Downloading] ${this.metaData.title}`);
         this.status = DOWNLOAD_STATUS.DOWNLOADING;
@@ -101,6 +118,7 @@ module.exports = class FFMPEGDriver {
             this.status = DOWNLOAD_STATUS.FAILED;
             process.env.DEBUG && console.log(e);
         });
+
     }
 
     _linkStreams = () => {

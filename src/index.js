@@ -8,8 +8,8 @@ const config = (config=DEFAULT_APP_CONFIG) => {
 }
 
 const loop =  async () => {
-    await DownloadManager.downloadAll();
     await DownloadManager.updateDownloadQueue();
+    await DownloadManager.downloadAll();
 }
 
 const start = async () => {

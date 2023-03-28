@@ -42,7 +42,7 @@ module.exports = class YoutubeDownloader extends FFMPEGDriver {
                 } else if(accumulator.length == 0){
                     res = await ytch.getChannelVideos({channelId, channelIdType});
                 } else if(cont){
-                    res = await ytch.getChannelVideosMore({continuation: cont   });
+                    res = await ytch.getChannelVideosMore({continuation: cont });
                 } else {
                     return accumulator;
                 }

@@ -8,22 +8,37 @@ this application automatically creates and manages a `manifest.json` file to tra
 
 ***
 
+## Status and compatibility
+
+This is a standalone Node.js service that monitors Zotero collections. Compatibility with current YouTube endpoints has not yet been revalidated. [Issue #3](https://github.com/bmckalip/zotero-media-downloader/issues/3) tracks the known failure for content-restricted videos.
+
+The usage examples below include the exported defaults and use credentials supplied through the process environment. Create your configured output directory before starting the service. The historical changelog is retained below.
+
 ## Installation & Configuration
 
 1. in your project, run this command: `npm install zotero-media-downloader`
-2. to run zdl as a standalone server, import `config` and `run` functions from the package, and use them in the following way:
+2. to run zdl as a standalone server, import `config`, `start`, and `DEFAULT_APP_CONFIG` from the package, and use them in the following way:
 ```js
-const { config, start } = require('zotero-media-downloader');
+const { config, start, DEFAULT_APP_CONFIG } = require('zotero-media-downloader');
 
-const main() {
+const main = async () => {
+    if (!process.env.ZOTERO_API_KEY || !process.env.ZOTERO_USER_ID) {
+        throw new Error('Set ZOTERO_API_KEY and ZOTERO_USER_ID before starting.');
+    }
+
     config({
-        ZOTERO_API_KEY: "<your-zotero-api-key>",
-        ZOTERO_USER_ID: "<your-zotero-user-id>"
+        ...DEFAULT_APP_CONFIG,
+        ZOTERO_API_KEY: process.env.ZOTERO_API_KEY,
+        ZOTERO_USER_ID: process.env.ZOTERO_USER_ID,
+        BASE_PATH: process.env.ZDL_BASE_PATH || './downloads'
     });
-    start();
-}
+    await start();
+};
 
-main();
+main().catch(() => {
+    console.error('Downloader startup failed.');
+    process.exitCode = 1;
+});
 ```
 
 3. In the Zotero Desktop or Web App, create a new `collection` that matches the value you have specified for your `ZOTERO_VIDEO_COLLECTION_NAME` environment variable in your config. e.g. `zytdl`. You can also create and specify `ZOTERO_AUDIO_COLLECTION_NAME` in the same way. See Below for all config properties.
@@ -34,7 +49,7 @@ main();
 
 ## Configuration
 
-Note: some of these values like `ZOTERO_API_KEY`, `ZOTERO_USER_ID`, and `YT_USER_COOKIE` should be specified in a .env file and not commited to your source control to protect their sensitivity. This is not in the scope of this README, please see packages `dotenv` && `dotenv-parse-variables` for more information. 
+Treat `ZOTERO_API_KEY`, `ZOTERO_USER_ID`, and `YT_USER_COOKIE` as sensitive configuration. Supply them through your secret manager or protected process environment; keep their values out of source control, screenshots and logs. Pass `...DEFAULT_APP_CONFIG` before your overrides so defaults such as the polling interval remain available. 
 
 | Property Name                    | Data Type | Required | Default Value | Description                                                                                                                                     |
 |----------------------------------|-----------|----------|---------------|-------------------------------------------------------------------------------------------------------------------------------------------------|  
@@ -50,7 +65,7 @@ Note: some of these values like `ZOTERO_API_KEY`, `ZOTERO_USER_ID`, and `YT_USER
 | DRYRUN                           | Boolean   | no       | false         | Will prevent any videos rom actually being downloaded. Zotero API will still be accessed like normal |
 | LOOP_INTERVAL_MINUTES            | Number    | no       | 5             | This is the number in minutes that zotero will be polled for new videos in the specified collections |
 | CHANNEL_DOWNLOAD_MAX_DEPTH       | Number    | no       | -1            | If channel links are detected in the collection, this value refers to the max number of most recent videos to download from the channel. |
-| DOWNLOAD_BATCH_SIZE              | Boolean   | no       | 5             | The number of videos to download simulaneously. This value should be increased or decreased depending on the speed of your internet connection. |
+| DOWNLOAD_BATCH_SIZE              | Number   | no       | 5             | The number of videos to download simulaneously. This value should be increased or decreased depending on the speed of your internet connection. |
 | PRESERVE_LOG                     | Boolean   | no       | false         | If set to true, prevent the console output from clearing after each loop | 
 
 ***
@@ -81,21 +96,29 @@ To find your `API key` and `userID` for zotero, login to your zotero web account
 If you need more control over how and when downloading occurs, you can import the DownloadManager class directly and use it as required. Note: the config function automatically injects your config into process.env
 
 ```js
-    const {config, loop, DownloadManager} = require('zotero-media-downloader');
-    const main customUsage = async () => {
-        config({
-            ZOTERO_API_KEY: "<your-zotero-api-key>",
-            ZOTERO_USER_ID: "<your-zotero-user-id>"
-        });
+const { config, loop, DownloadManager, DEFAULT_APP_CONFIG } = require('zotero-media-downloader');
 
-        const { LOOP_INTERVAL_MINUTES, DRYRUN }  = process.env;
-        await DownloadManager.buildManifest();
-        DRYRUN && console.log(`[DRYRUN] no videos will be downloaded and the manifest will not be changed. The Zotero API will still be accessed.`)
-        setInterval(loop, LOOP_INTERVAL_MINUTES * 60 * 1000);
-        loop();
+const customUsage = async () => {
+    if (!process.env.ZOTERO_API_KEY || !process.env.ZOTERO_USER_ID) {
+        throw new Error('Set ZOTERO_API_KEY and ZOTERO_USER_ID before starting.');
     }
 
-    customUsage();
+    config({
+        ...DEFAULT_APP_CONFIG,
+        ZOTERO_API_KEY: process.env.ZOTERO_API_KEY,
+        ZOTERO_USER_ID: process.env.ZOTERO_USER_ID,
+        BASE_PATH: process.env.ZDL_BASE_PATH || './downloads'
+    });
+    const { LOOP_INTERVAL_MINUTES } = process.env;
+    await DownloadManager.buildManifest();
+    setInterval(loop, Number(LOOP_INTERVAL_MINUTES) * 60 * 1000);
+    await loop();
+};
+
+customUsage().catch(() => {
+    console.error('Downloader startup failed.');
+    process.exitCode = 1;
+});
 ```
 
 ***

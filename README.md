@@ -8,11 +8,19 @@ this application automatically creates and manages a `manifest.json` file to tra
 
 ***
 
-## Status and compatibility
+## Status, support and releases
 
-This is a standalone Node.js service that monitors Zotero collections. Compatibility with current YouTube endpoints has not yet been revalidated. [Issue #3](https://github.com/bmckalip/zotero-media-downloader/issues/3) tracks the known failure for content-restricted videos.
+Status checked November 4, 2026. This is a historical standalone Node.js utility. Current end-to-end compatibility with Zotero, YouTube and FFmpeg has not been revalidated, so a successful live download is not currently established.
 
-The usage examples below include the exported defaults and use credentials supplied through the process environment. Create your configured output directory before starting the service. The historical changelog is retained below.
+- The latest published [npm package](https://www.npmjs.com/package/zotero-media-downloader) is **1.3.1**, published March 28, 2023. The repository also declares 1.3.1; there are currently no GitHub releases or tags. The six runtime JavaScript files in the published package match the repository after line-ending normalization. The newer repository README is separate from the published package's older README.
+- No supported Node.js version range is declared in `package.json`. An isolated check on **Node.js 22.22.2** passed manifest creation/save/reload, fixture Zotero pagination and URL deduplication, direct YouTube watch-URL extraction, duplicate-queue suppression and dispatch. Collection responses and the media adapter were fixtures, dependency install scripts were disabled, and no live API or FFmpeg media output was tested. This is limited runtime evidence, not an end-to-end compatibility result.
+- [Issue #3](https://github.com/bmckalip/zotero-media-downloader/issues/3) remains open for content-restricted videos failing with a miniget 410 error. Playlist extraction is also marked broken in the current source. See open issues and source limitations before relying on the utility.
+
+The usage examples below preserve exported defaults and take credentials from the process environment. Create the configured output directory before starting. The historical roadmap and changelog are retained as development history. A future support/release claim needs representative live downloader verification and dependency/provenance review.
+
+### License provenance
+
+The repository's `package.json` and npm metadata declare **ISC**, while GitHub's repository metadata reports **MIT**. The default branch and published npm archive contain no license text file, and GitHub's license endpoint returns 404. These records are inconsistent; the provenance remains unresolved. Reconcile the original author/source records before adding license terms or preparing a new release. Existing dependency and upstream attribution records remain separate.
 
 ## Installation & Configuration
 
